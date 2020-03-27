@@ -7,6 +7,11 @@ const typeDefs = gql`
     releaseDate: String
     rating: Int
   }
+
+  # Define a query
+  Query {
+    movies: [Movie]
+  }
 `;
 
 const movies = [
@@ -21,3 +26,12 @@ const movies = [
     rating: 5
   }
 ];
+
+// Dạng cơ bản, 1 GraphQL server sẽ có 1 hàm resolver cho mỗi 1 field trong schema của nó.
+const resolvers = {
+  Query: {
+    movies: () => {
+      return movies;
+    }
+  }
+};
