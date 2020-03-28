@@ -9,7 +9,7 @@ const typeDefs = gql`
   }
 
   # Define a query
-  Query {
+  type Query {
     movies: [Movie]
   }
 `;
@@ -35,3 +35,9 @@ const resolvers = {
     }
   }
 };
+
+const server = new ApolloServer({ typeDefs, resolvers });
+// Chạy node index.js
+server.listen().then(({ url }) => {
+  console.log(`SERVER STARTED AT ${url}`);
+});
