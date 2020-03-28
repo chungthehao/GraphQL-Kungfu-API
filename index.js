@@ -1,11 +1,28 @@
 const { ApolloServer, gql } = require("apollo-server");
 
 const typeDefs = gql`
-  # comment here: Schema -> The thing that defines your types
+  # Schema -> The thing that defines your types
+  enum Status { # Giá trị chỉ nằm trong 1 tập hữu hạn biết trước
+    WATCHED
+    INTERESTED
+    NOT_INTERESTED
+    UNKNOWN
+  }
+
+  type Actor {
+    id: ID
+    name: String
+  }
+
   type Movie {
+    id: ID # type đặc biệt nè
     title: String
     releaseDate: String
     rating: Int
+    # fake1: Float
+    # fake2: Boolean
+    status: Status
+    actor: [Actor]
   }
 
   # Define a query
