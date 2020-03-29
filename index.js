@@ -10,19 +10,21 @@ const typeDefs = gql`
   }
 
   type Actor {
-    id: ID
-    name: String
+    id: ID!
+    name: String!
   }
 
   type Movie {
-    id: ID # type đặc biệt nè
-    title: String
+    id: ID! # type đặc biệt nè
+    title: String!
     releaseDate: String
     rating: Int
     # fake1: Float
     # fake2: Boolean
     status: Status
-    actor: [Actor]
+    actor: [Actor] # Valid: null, [], [...some data]; Not valid: [ some data without name or id ]
+    # actor: [Actor]! # Valid: [], [...some data]; Not valid: [ some data without name or id ]
+    # actor: [Actor!]! # Valid: [...some data]; Not valid: [ some data without name or id ]
   }
 
   # Define a query
@@ -33,14 +35,27 @@ const typeDefs = gql`
 
 const movies = [
   {
+    id: "dfkjfjvh4858rj34ju1",
     title: "5 Deadly Venoms",
     releaseDate: "12-08-1978",
-    rating: 5
+    rating: 5,
+    actor: [
+      {
+        id: "23eb3hc31h329y7",
+        name: "Gordon Liu"
+      }
+    ]
   },
   {
+    id: "3rdfj23ej3jc34",
     title: "The 36th Chamber of Shaolin",
     releaseDate: "02-02-1978",
-    rating: 5
+    rating: 5,
+    actor: [
+      {
+        name: "Henry"
+      }
+    ]
   }
 ];
 
