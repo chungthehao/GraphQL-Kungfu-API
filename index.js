@@ -22,14 +22,15 @@ const typeDefs = gql`
     # fake1: Float
     # fake2: Boolean
     status: Status
-    actor: [Actor] # Valid: null, [], [...some data]; Not valid: [ some data without name or id ]
-    # actor: [Actor]! # Valid: [], [...some data]; Not valid: [ some data without name or id ]
+    # actor: [Actor] # Valid: null, [], [...some data]; Not valid: [ some data without name or id ]
+    actor: [Actor]! # Valid: [], [...some data]; Not valid: [ some data without name or id ]
     # actor: [Actor!]! # Valid: [...some data]; Not valid: [ some data without name or id ]
   }
 
   # Define a query
   type Query {
     movies: [Movie]
+    movie(id: ID): Movie
   }
 `;
 
@@ -40,10 +41,10 @@ const movies = [
     releaseDate: "12-08-1978",
     rating: 5,
     actor: [
-      {
-        id: "23eb3hc31h329y7",
-        name: "Gordon Liu"
-      }
+      // {
+      //   id: "23eb3hc31h329y7",
+      //   name: "Gordon Liu"
+      // }
     ]
   },
   {
@@ -52,9 +53,9 @@ const movies = [
     releaseDate: "02-02-1978",
     rating: 5,
     actor: [
-      {
-        name: "Henry"
-      }
+      // {
+      //   name: "Henry"
+      // }
     ]
   }
 ];
@@ -64,6 +65,14 @@ const resolvers = {
   Query: {
     movies: () => {
       return movies;
+    },
+
+    // obj: liên quan tới cấp cao hơn; context: thông tin user, auth,...; info: ít dùng, tìm hiểu sau
+    movie: (obj, args, context, info) => {
+      const { id } = args;
+      const foundMovie = movies.find(m => m.id === id);
+
+      return foundMovie;
     }
   }
 };
