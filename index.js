@@ -27,8 +27,8 @@ const typeDefs = gql`
     # fake1: Float
     # fake2: Boolean
     status: Status
-    # actor: [Actor] # Valid: null, [], [...some data]; Not valid: [ some data without name or id ]
-    actor: [Actor]! # Valid: [], [...some data]; Not valid: [ some data without name or id ]
+    actor: [Actor] # Valid: null, [], [...some data]; Not valid: [ some data without name or id ]
+    # actor: [Actor]! # Valid: [], [...some data]; Not valid: [ some data without name or id ]
     # actor: [Actor!]! # Valid: [...some data]; Not valid: [ some data without name or id ]
   }
 
@@ -39,6 +39,17 @@ const typeDefs = gql`
   }
 `;
 
+const actors = [
+  {
+    id: "gordon",
+    name: "Gordon Liu"
+  },
+  {
+    id: "jakie",
+    name: "Jakie Chan"
+  }
+];
+
 const movies = [
   {
     id: "dfkjfjvh4858rj34ju1",
@@ -46,22 +57,16 @@ const movies = [
     releaseDate: new Date("12-08-1978"),
     rating: 5,
     actor: [
-      // {
-      //   id: "23eb3hc31h329y7",
-      //   name: "Gordon Liu"
-      // }
+      {
+        id: "jakie"
+      }
     ]
   },
   {
     id: "3rdfj23ej3jc34",
     title: "The 36th Chamber of Shaolin",
     releaseDate: new Date("02-02-1978"),
-    rating: 5,
-    actor: [
-      // {
-      //   name: "Henry"
-      // }
-    ]
+    rating: 5
   }
 ];
 
@@ -78,6 +83,28 @@ const resolvers = {
       const foundMovie = movies.find(m => m.id === id);
 
       return foundMovie;
+    }
+  },
+  Movie: {
+    actor: (movie, args, context) => {
+      console.log("movie", movie);
+
+      if (!("actor" in movie)) return [];
+
+      // Lẽ ra là các DB call
+      const actorIds = movie.actor.map(a => a.id);
+      const filteredActors = actors.filter(a => actorIds.includes(a.id));
+
+      return filteredActors;
+
+      // return actors;
+
+      // return [
+      //   {
+      //     id: "3289r423r4h238h",
+      //     name: "Scott"
+      //   }
+      // ];
     }
   },
   Date: new GraphQLScalarType({
