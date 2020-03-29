@@ -79,6 +79,10 @@ const resolvers = {
 
 const server = new ApolloServer({ typeDefs, resolvers });
 // Chạy node index.js
-server.listen().then(({ url }) => {
-  console.log(`SERVER STARTED AT ${url}`);
-});
+server
+  .listen({
+    port: process.env.PORT || 4000
+  })
+  .then(({ url }) => {
+    console.log(`SERVER STARTED AT ${url}`);
+  });
