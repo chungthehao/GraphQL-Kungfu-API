@@ -37,6 +37,11 @@ const typeDefs = gql`
     movies: [Movie]
     movie(id: ID): Movie
   }
+
+  # Define a mutation
+  type Mutation {
+    addMovie(id: ID, title: String, releaseDate: Date): [Movie]
+  }
 `;
 
 const actors = [
@@ -96,15 +101,19 @@ const resolvers = {
       const filteredActors = actors.filter(a => actorIds.includes(a.id));
 
       return filteredActors;
-
-      // return actors;
-
-      // return [
-      //   {
-      //     id: "3289r423r4h238h",
-      //     name: "Scott"
-      //   }
-      // ];
+    }
+  },
+  Mutation: {
+    addMovie: (obj, args, context) => {
+      const { id, title, releaseDate } = args;
+      // Do mutation & All of our database stuff
+      const newMovieList = [
+        ...movies,
+        // new movie data
+        { id, title, releaseDate }
+      ];
+      // Return data as expected in schema
+      return newMovieList;
     }
   },
   Date: new GraphQLScalarType({
