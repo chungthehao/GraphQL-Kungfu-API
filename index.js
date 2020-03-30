@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql, PubSub } = require("apollo-server");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
 const mongoose = require("mongoose");
@@ -74,6 +74,11 @@ const typeDefs = gql`
   type Mutation {
     addMovie(newMovie: MovieInput): [Movie]
   }
+
+  # Define a subscription
+  type Subscription {
+    movieAdded: Movie
+  }
 `;
 
 const actors = [
@@ -111,8 +116,17 @@ const movies = [
   }
 ];
 
+const pubsub = new PubSub();
+const MOVIE_ADDED = "MOVIE_ADDED";
+
 // Dạng cơ bản, 1 GraphQL server sẽ có 1 hàm resolver cho mỗi 1 field trong schema của nó.
 const resolvers = {
+  Subscription: {
+    movieAdded: {
+      subscribe: () => pubsub.asyncIterator([MOVIE_ADDED])
+    }
+  },
+
   Query: {
     movies: async () => {
       try {
@@ -158,7 +172,8 @@ const resolvers = {
       if (context.userId) {
         try {
           // Do mutation & All of our database stuff
-          await Movie.create(newMovie);
+          const justAddedMovie = await Movie.create(newMovie);
+          pubsub.publish(MOVIE_ADDED, { movieAdded: justAddedMovie });
           const allMovies = await Movie.find();
 
           // Return data as expected in schema
