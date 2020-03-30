@@ -2,6 +2,7 @@ const { ApolloServer, gql } = require("apollo-server");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
 
+// gql`` parses your string into AST (Abstract Syntax Tree)
 const typeDefs = gql`
   # Schema -> The thing that defines your types
 
