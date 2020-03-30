@@ -1,6 +1,13 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
+const mongoose = require("mongoose");
+
+// Thay chuỗi dưới bằng cái tạo được ở mongoDB Atlas
+mongoose.connect("mongodb://localhost:27017/test", {
+  useNewUrlParser: true
+});
+const db = mongoose.connection;
 
 // gql`` parses your string into AST (Abstract Syntax Tree)
 const typeDefs = gql`
@@ -173,11 +180,17 @@ const server = new ApolloServer({
     return { ...fakeUser };
   }
 });
-// Chạy node index.js
-server
-  .listen({
-    port: process.env.PORT || 4000
-  })
-  .then(({ url }) => {
-    console.log(`SERVER STARTED AT ${url}`);
-  });
+
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function() {
+  console.log("we're connected!");
+
+  // Chạy node index.js
+  server
+    .listen({
+      port: process.env.PORT || 4000
+    })
+    .then(({ url }) => {
+      console.log(`SERVER STARTED AT ${url}`);
+    });
+});
