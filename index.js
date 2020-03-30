@@ -38,9 +38,23 @@ const typeDefs = gql`
     movie(id: ID): Movie
   }
 
+  # Define a input type, để trong mutation của typeDefs và params của nó tương ứng ở resolver
+  input MovieInput {
+    id: ID
+    title: String
+    releaseDate: Date
+    rating: Int
+    status: Status
+    actor: [ActorInput]
+  }
+
+  input ActorInput {
+    id: ID
+  }
+
   # Define a mutation
   type Mutation {
-    addMovie(id: ID, title: String, releaseDate: Date): [Movie]
+    addMovie(newMovie: MovieInput): [Movie]
   }
 `;
 
@@ -52,6 +66,10 @@ const actors = [
   {
     id: "jakie",
     name: "Jakie Chan"
+  },
+  {
+    id: "abc",
+    name: "A B C"
   }
 ];
 
@@ -105,12 +123,12 @@ const resolvers = {
   },
   Mutation: {
     addMovie: (obj, args, context) => {
-      const { id, title, releaseDate } = args;
+      const { newMovie } = args;
       // Do mutation & All of our database stuff
       const newMovieList = [
         ...movies,
         // new movie data
-        { id, title, releaseDate }
+        newMovie
       ];
       // Return data as expected in schema
       return newMovieList;
