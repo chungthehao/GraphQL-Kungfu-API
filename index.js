@@ -9,6 +9,16 @@ mongoose.connect("mongodb://localhost:27017/test", {
 });
 const db = mongoose.connection;
 
+const movieSchema = new mongoose.Schema({
+  title: String,
+  releaseDate: Date,
+  rating: Number,
+  status: String,
+  actorIds: [String]
+});
+
+const Movie = mongoose.model("Movie", movieSchema);
+
 // gql`` parses your string into AST (Abstract Syntax Tree)
 const typeDefs = gql`
   # Schema -> The thing that defines your types
@@ -104,16 +114,27 @@ const movies = [
 // Dạng cơ bản, 1 GraphQL server sẽ có 1 hàm resolver cho mỗi 1 field trong schema của nó.
 const resolvers = {
   Query: {
-    movies: () => {
-      return movies;
+    movies: async () => {
+      try {
+        const allMovies = await Movie.find();
+        return allMovies;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
     },
 
     // obj: liên quan tới cấp cao hơn; context: thông tin user, auth,...; info: ít dùng, tìm hiểu sau
-    movie: (obj, args, context, info) => {
-      const { id } = args;
-      const foundMovie = movies.find(m => m.id === id);
+    movie: async (obj, args, context, info) => {
+      try {
+        const { id } = args;
+        const foundMovie = await Movie.findById(id);
 
-      return foundMovie;
+        return foundMovie;
+      } catch (error) {
+        console.log(error);
+        return {};
+      }
     }
   },
   Movie: {
@@ -130,23 +151,25 @@ const resolvers = {
     }
   },
   Mutation: {
-    addMovie: (obj, args, context) => {
+    addMovie: async (obj, args, context) => {
       // console.log(context);
       const { newMovie } = args;
 
       if (context.userId) {
-        // Do mutation & All of our database stuff
-        const newMovieList = [
-          ...movies,
-          // new movie data
-          newMovie
-        ];
+        try {
+          // Do mutation & All of our database stuff
+          await Movie.create(newMovie);
+          const allMovies = await Movie.find();
 
-        // Return data as expected in schema
-        return newMovieList;
+          // Return data as expected in schema
+          return allMovies;
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
       }
 
-      return movies;
+      return [];
     }
   },
   Date: new GraphQLScalarType({
