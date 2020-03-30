@@ -123,15 +123,22 @@ const resolvers = {
   },
   Mutation: {
     addMovie: (obj, args, context) => {
+      // console.log(context);
       const { newMovie } = args;
-      // Do mutation & All of our database stuff
-      const newMovieList = [
-        ...movies,
-        // new movie data
-        newMovie
-      ];
-      // Return data as expected in schema
-      return newMovieList;
+
+      if (context.userId) {
+        // Do mutation & All of our database stuff
+        const newMovieList = [
+          ...movies,
+          // new movie data
+          newMovie
+        ];
+
+        // Return data as expected in schema
+        return newMovieList;
+      }
+
+      return movies;
     }
   },
   Date: new GraphQLScalarType({
@@ -158,7 +165,12 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   introspection: true,
-  playground: true
+  playground: true,
+  context: ({ req }) => {
+    console.log("HI HENRY!");
+    const fakeUser = { userId: "hi_I_am_a_user" };
+    return { ...fakeUser };
+  }
 });
 // Chạy node index.js
 server
